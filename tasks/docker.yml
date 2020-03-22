@@ -1,0 +1,65 @@
+---
+- name: Install dependencies
+  apt:
+    update_cache: yes
+    state: latest
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg2
+      - gnupg-agent
+      - software-properties-common
+      - python3-setuptools
+      - python3-pip
+  tags:
+    - docker
+    - system
+
+- name: Add Docker GPG apt key
+  apt_key:
+    url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+    state: present
+  tags:
+    - docker
+
+- name: Add Docker repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
+    # repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} buster stable"
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+
+- name: Install docker-ce
+  apt:
+    state: latest
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+  tags:
+    - docker
+
+- name: Set Docker service state
+  service:
+    name: docker
+    state: started
+    enabled: true
+  tags:
+    - docker
+
+- name: Install Docker module for Python
+  pip:
+    name: docker
+  tags:
+    - docker
+
+- name: Install docker-compose
+  script: scripts/install-docker-compose
+  args:
+    creates: /usr/local/bin/docker-compose
+  tags:
+    - docker
+    - docker-compose
