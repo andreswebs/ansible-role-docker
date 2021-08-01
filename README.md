@@ -1,11 +1,27 @@
 # ansible-role-docker
 
-Installs Docker and docker-compose
+Ansible role to install Docker and docker-compose.
 
-## role variables
 
-None
+## Requirements
 
-## license
+The `jq` program must be installed on the host. See the [jq web page](https://stedolan.github.io/jq/) to install.
 
-[Unlicense](UNLICENSE.md)
+
+## Example Playbook
+
+```sh
+- hosts: servers
+  roles:
+    - role: andreswebs.ansible-role-docker
+```
+
+
+## Authors
+
+**Andre Silva** [@andreswebs](https://github.com/andreswebs)
+
+
+## License
+
+This project is licensed under the [Unlicense](UNLICENSE.md).

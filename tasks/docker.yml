@@ -1,8 +1,8 @@
 ---
 - name: Install dependencies
-  apt:
-    update_cache: yes
+  ansible.builtin.apt:
     state: latest
+    update_cache: yes
     name:
       - apt-transport-https
       - ca-certificates
@@ -12,30 +12,32 @@
       - software-properties-common
       - python3-setuptools
       - python3-pip
-      - python3-virtualenv
+      - python3-venv
   tags:
     - docker
     - system
 
 - name: Add Docker GPG apt key
-  apt_key:
-    url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+  ansible.builtin.apt_key:
     state: present
+    url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+    keyring: /etc/apt/trusted.gpg.d/docker.gpg
   tags:
     - docker
 
 - name: Add Docker repository
-  apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
-    # repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} buster stable"
+  ansible.builtin.apt_repository:
     state: present
     update_cache: yes
+    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
+    filename: docker
   tags:
     - docker
 
 - name: Install docker-ce
-  apt:
+  ansible.builtin.apt:
     state: latest
+    update_cache: yes
     name:
       - docker-ce
       - docker-ce-cli
@@ -44,7 +46,7 @@
     - docker
 
 - name: Set Docker service state
-  service:
+  ansible.builtin.service:
     name: docker
     state: started
     enabled: true
@@ -52,13 +54,13 @@
     - docker
 
 - name: Install Docker module for Python
-  pip:
+  ansible.builtin.pip:
     name: docker
   tags:
     - docker
 
 - name: Install docker-compose
-  script: scripts/install-docker-compose
+  ansible.builtin.script: scripts/install-docker-compose
   args:
     creates: /usr/local/bin/docker-compose
   tags:
