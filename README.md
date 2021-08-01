@@ -13,7 +13,7 @@ The `jq` program must be installed on the host. See the [jq web page](https://st
 ```sh
 - hosts: servers
   roles:
-    - role: andreswebs.ansible-role-docker
+    - role: andreswebs.docker
 ```
 
 
