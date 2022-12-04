@@ -1,1 +1,4 @@
 ---
+docker_key_url: "https://download.docker.com/linux/{{ ansible_distribution | lower }}/gpg"
+docker_key_dir: /etc/apt/trusted.gpg.d
+docker_key_file: "{{ docker_key_dir }}/docker.asc"
