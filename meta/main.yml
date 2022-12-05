@@ -11,11 +11,13 @@ galaxy_info:
   github_branch: main
 
   platforms:
+    - name: Debian
+      versions:
+        - all
     - name: Ubuntu
       versions:
-        - bionic
-        - focal
-
+        - all
+        
   galaxy_tags:
     - docker
 

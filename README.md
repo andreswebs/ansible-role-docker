@@ -1,10 +1,10 @@
 # ansible-role-docker
 
-Ansible role to install Docker and docker-compose.
+Ansible role to install Docker and Docker Compose.
 
 ## Example Playbook
 
-```sh
+```yaml
 - hosts: servers
   roles:
     - role: andreswebs.docker
