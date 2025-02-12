@@ -7,7 +7,7 @@ galaxy_info:
 
   license: Unlicense
 
-  min_ansible_version: "2.9"
+  min_ansible_version: "2.18"
 
   github_branch: main
 

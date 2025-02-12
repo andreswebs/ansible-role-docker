@@ -1,0 +1,23 @@
+---
+# profile: null # min, basic, moderate,safety, shared, production
+profile: production
+
+sarif_file: ansible-lint.result.sarif
+
+var_naming_pattern: "^[a-z_][a-z0-9_]*$"
+
+use_default_rules: true
+
+enable_list:
+  - args
+  - empty-string-compare
+  - no-log-password
+  - no-same-owner
+  - name[prefix]
+  - galaxy-version-incorrect
+  - yaml
+
+warn_list:
+  - experimental
+
+offline: false
