@@ -1,3 +1,4 @@
 tasks/main.yml name[missing]
 tasks/docker.yml package-latest
 tasks/docker.yml command-instead-of-shell
+tests/test.yml name[play]
