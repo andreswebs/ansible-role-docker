@@ -3,6 +3,7 @@ galaxy_info:
   author: Andre Silva
   description: Installs Docker and Docker Compose
   role_name: docker
+  namespace: andreswebs
 
   license: Unlicense
 
