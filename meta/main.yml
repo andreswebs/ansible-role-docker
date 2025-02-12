@@ -3,10 +3,10 @@ galaxy_info:
   author: Andre Silva
   description: Installs Docker and Docker Compose
   role_name: docker
-  
+
   license: Unlicense
 
-  min_ansible_version: 2.9
+  min_ansible_version: "2.9"
 
   github_branch: main
 
@@ -17,7 +17,7 @@ galaxy_info:
     - name: Ubuntu
       versions:
         - all
-        
+
   galaxy_tags:
     - docker
 
