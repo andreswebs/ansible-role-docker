@@ -16,11 +16,23 @@
   tags:
     - docker
 
-- name: "docker | Add Docker archive key: {{ docker_key_file }}"
+- name: "docker | Ensure {{ docker_key_dir }}"
+  ansible.builtin.file:
+    path: "{{ docker_key_dir }}"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+  tags:
+    - docker
+
+- name: "docker | Add Docker archive key: {{ docker_key_dir }}/{{ docker_key_file }}"
   ansible.builtin.get_url:
     url: "{{ docker_key_url }}"
-    dest: "{{ docker_key_file }}"
+    dest: "{{ docker_key_dir }}/{{ docker_key_file }}"
     mode: "0644"
+    owner: root
+    group: root
   tags:
     - docker
 
@@ -28,7 +40,7 @@
   ansible.builtin.apt_repository:
     state: present
     update_cache: true
-    repo: "deb [arch={{ deb_architecture.stdout }} signed-by={{ docker_key_file }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
+    repo: "deb [arch={{ deb_architecture.stdout }} signed-by={{ docker_key_dir }}/{{ docker_key_file }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
     filename: docker
   tags:
     - docker

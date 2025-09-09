@@ -2,6 +2,11 @@
 
 Ansible role to install Docker and Docker Compose.
 
+See the official installation docs:
+
+- <https://docs.docker.com/engine/install/debian/>
+- <https://docs.docker.com/engine/install/ubuntu/>
+
 ## Example Playbook
 
 ```yaml
@@ -16,4 +21,4 @@ Ansible role to install Docker and Docker Compose.
 
 ## License
 
-This project is licensed under the [Unlicense](UNLICENSE.md).
+This project is licensed under the [Unlicense](UNLICENSE).
