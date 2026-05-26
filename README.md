@@ -1,6 +1,6 @@
 # ansible-role-docker
 
-Ansible role to install Docker and Docker Compose.
+Ansible role to install Docker and Docker Compose on Debian or Ubunutu.
 
 See the official installation docs:
 
