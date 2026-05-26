@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          path: andreswebs.docker
+          path: docker
 
       - name: Set up uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
@@ -46,11 +46,11 @@ jobs:
             --with 'requests,python-dateutil,molecule-plugins[docker],docker'
 
       - name: Install Ansible collections
-        working-directory: andreswebs.docker
+        working-directory: docker
         run: ansible-galaxy collection install -r requirements.yml
 
       - name: Run Molecule
-        working-directory: andreswebs.docker
+        working-directory: docker
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
