@@ -5,9 +5,48 @@ on:
     branches: [main]
 jobs:
   lint:
-    name: Ansible Lint
-    runs-on: ubuntu-24.04
+    name: Lint
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+
+      - name: Install yamllint if needed
+        shell: bash
+        run: |
+          if ! command -v yamllint &> /dev/null; then
+            sudo pip3 install yamllint > /dev/null 2>&1
+          fi
+
+      - name: YAML Lint
+        run: yamllint .
+
       - name: ansible-lint
         uses: ansible/ansible-lint@main
+
+  molecule:
+    name: Molecule
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [default]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: andreswebs.docker
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+
+      - name: Install Molecule
+        run: |
+          uv tool install ansible-dev-tools \
+            --with-executables-from ansible-builder,ansible-core,ansible-creator,ansible-dev-environment,ansible-lint,ansible-sign,molecule,ansible-navigator \
+            --with 'requests,python-dateutil,molecule-plugins[docker],docker'
+
+      - name: Run Molecule
+        working-directory: andreswebs.docker
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+        run: molecule test -s ${{ matrix.scenario }}

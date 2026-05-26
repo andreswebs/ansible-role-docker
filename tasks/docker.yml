@@ -1,18 +1,32 @@
 ---
+- name: docker | Assert supported OS family
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] == 'Debian'
+    fail_msg: "This role supports Debian/Ubuntu only (got {{ ansible_facts['os_family'] }})."
+  tags:
+    - docker
+    - system
+
 - name: docker | Install dependencies
   ansible.builtin.apt:
-    state: latest
+    state: present
     update_cache: true
+    cache_valid_time: 3600
     name:
       - apt-transport-https
   tags:
     - docker
     - system
 
-- name: docker | DEB architecture
-  ansible.builtin.shell: dpkg --print-architecture
-  register: deb_architecture
-  changed_when: false
+- name: docker | Set DEB architecture
+  ansible.builtin.set_fact:
+    deb_architecture: "{{ deb_arch_map[ansible_facts['architecture']] | default(ansible_facts['architecture']) }}"
+  vars:
+    deb_arch_map:
+      x86_64: amd64
+      aarch64: arm64
+      armv7l: armhf
   tags:
     - docker
 
@@ -23,14 +37,13 @@
     group: root
     dest: "{{ docker_key_dir | regex_replace('/+$', '') }}"
     mode: "0755"
-    recurse: true
   tags:
     - docker
 
-- name: "docker | Add Docker archive key: {{ docker_key_dir | regex_replace('/+$', '') }}/{{ docker_key_file }}"
+- name: "docker | Add Docker archive key: {{ docker_key_path }}"
   ansible.builtin.get_url:
     url: "{{ docker_key_url }}"
-    dest: "{{ docker_key_dir | regex_replace('/+$', '') }}/{{ docker_key_file }}"
+    dest: "{{ docker_key_path }}"
     mode: "0644"
     owner: root
     group: root
@@ -38,18 +51,31 @@
     - docker
 
 - name: docker | Add Docker repository
-  ansible.builtin.apt_repository:
+  ansible.builtin.deb822_repository:
+    name: docker
     state: present
+    install_python_debian: true
+    types: deb
+    uris: "https://download.docker.com/linux/{{ ansible_facts['distribution'] | lower }}"
+    suites: "{{ ansible_facts['distribution_release'] | lower }}"
+    components: stable
+    architectures: "{{ deb_architecture }}"
+    signed_by: "{{ docker_key_path }}"
+  register: docker_repo
+  tags:
+    - docker
+
+- name: docker | Update apt cache after repo change
+  ansible.builtin.apt:
     update_cache: true
-    repo: "deb [arch={{ deb_architecture.stdout }} signed-by={{ docker_key_dir | regex_replace('/+$', '') }}/{{ docker_key_file }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} stable"
-    filename: docker
+  when: docker_repo.changed
   tags:
     - docker
 
 - name: docker | Install packages
   ansible.builtin.apt:
-    state: latest
-    update_cache: true
+    state: "{{ docker_pkg_state }}"
+    cache_valid_time: 3600
     name:
       - docker-ce
       - docker-ce-cli

@@ -1,0 +1,49 @@
+---
+role_name_check: 1
+
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+platforms:
+  - name: docker-ubuntu-2404
+    image: geerlingguy/docker-ubuntu2404-ansible:latest
+    pre_build_image: true
+    privileged: true
+    cgroupns_mode: host
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    command: /lib/systemd/systemd
+  - name: docker-debian-13
+    image: geerlingguy/docker-debian13-ansible:latest
+    pre_build_image: true
+    privileged: true
+    cgroupns_mode: host
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    command: /lib/systemd/systemd
+
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/.."
+  config_options:
+    defaults:
+      stdout_callback: default
+      result_format: yaml
+      inject_facts_as_vars: false
+
+verifier:
+  name: ansible
+
+scenario:
+  test_sequence:
+    - destroy
+    - syntax
+    - create
+    - converge
+    - idempotence
+    - verify
+    - destroy

@@ -1,0 +1,47 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: apt
+
+    - name: Assert Docker packages are installed
+      ansible.builtin.assert:
+        that:
+          - "'docker-ce' in ansible_facts.packages"
+          - "'docker-ce-cli' in ansible_facts.packages"
+          - "'containerd.io' in ansible_facts.packages"
+          - "'docker-compose-plugin' in ansible_facts.packages"
+          - "'docker-buildx-plugin' in ansible_facts.packages"
+
+    - name: Check Docker keyring file exists
+      ansible.builtin.stat:
+        path: "{{ docker_key_path | default('/usr/share/keyrings/docker.asc') }}"
+      register: docker_key_stat
+
+    - name: Assert keyring file is present and world-readable
+      ansible.builtin.assert:
+        that:
+          - docker_key_stat.stat.exists
+          - docker_key_stat.stat.mode == '0644'
+
+    - name: Check Docker apt source is configured
+      ansible.builtin.stat:
+        path: /etc/apt/sources.list.d/docker.sources
+      register: docker_repo_stat
+
+    - name: Assert Docker repo file exists
+      ansible.builtin.assert:
+        that:
+          - docker_repo_stat.stat.exists
+
+    - name: Run docker version
+      ansible.builtin.command: docker version --format '{% raw %}{{.Server.Version}}{% endraw %}'
+      register: docker_version
+      changed_when: false
+
+    - name: Show docker version
+      ansible.builtin.debug:
+        var: docker_version.stdout
