@@ -26,6 +26,7 @@ jobs:
   molecule:
     name: Molecule
     runs-on: ubuntu-24.04
+    needs: [lint]
     strategy:
       fail-fast: false
       matrix:
@@ -33,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          path: andreswebs.docker
+          path: docker
 
       - name: Set up uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
@@ -44,8 +45,12 @@ jobs:
             --with-executables-from ansible-builder,ansible-core,ansible-creator,ansible-dev-environment,ansible-lint,ansible-sign,molecule,ansible-navigator \
             --with 'requests,python-dateutil,molecule-plugins[docker],docker'
 
+      - name: Install Ansible collections
+        working-directory: docker
+        run: ansible-galaxy collection install -r requirements.yml
+
       - name: Run Molecule
-        working-directory: andreswebs.docker
+        working-directory: docker
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"

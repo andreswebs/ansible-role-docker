@@ -1,5 +1,9 @@
 ---
-- name: docker | Restart docker
+- name: Docker | Restart docker
   ansible.builtin.service:
     name: docker
     state: restarted
+
+- name: Docker | Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
