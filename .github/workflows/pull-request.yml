@@ -26,6 +26,7 @@ jobs:
   molecule:
     name: Molecule
     runs-on: ubuntu-24.04
+    needs: [lint]
     strategy:
       fail-fast: false
       matrix:
@@ -43,6 +44,10 @@ jobs:
           uv tool install ansible-dev-tools \
             --with-executables-from ansible-builder,ansible-core,ansible-creator,ansible-dev-environment,ansible-lint,ansible-sign,molecule,ansible-navigator \
             --with 'requests,python-dateutil,molecule-plugins[docker],docker'
+
+      - name: Install Ansible collections
+        working-directory: andreswebs.docker
+        run: ansible-galaxy collection install -r requirements.yml
 
       - name: Run Molecule
         working-directory: andreswebs.docker

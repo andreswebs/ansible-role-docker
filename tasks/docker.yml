@@ -61,14 +61,12 @@
     components: stable
     architectures: "{{ deb_architecture }}"
     signed_by: "{{ docker_key_path }}"
-  register: docker_repo
+  notify: Docker | Update apt cache
   tags:
     - docker
 
-- name: docker | Update apt cache after repo change
-  ansible.builtin.apt:
-    update_cache: true
-  when: docker_repo.changed
+- name: docker | Flush handlers before installing packages
+  ansible.builtin.meta: flush_handlers
   tags:
     - docker
 
