@@ -4,6 +4,8 @@
     name: docker
     state: restarted
 
-- name: Docker | Update apt cache
-  ansible.builtin.apt:
-    update_cache: true
+## 'Docker | Update apt cache' was removed. It was notified only by the
+## repository task, and a cache refresh that happens only when the repository
+## changes is refreshed on exactly the run that does not need it. The refresh
+## is now an unconditional task in tasks/docker.yml, ordered after the
+## repository and before the install.

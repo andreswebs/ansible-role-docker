@@ -61,19 +61,38 @@
     components: stable
     architectures: "{{ deb_architecture }}"
     signed_by: "{{ docker_key_path }}"
-  notify: Docker | Update apt cache
   tags:
     - docker
 
-- name: docker | Flush handlers before installing packages
-  ansible.builtin.meta: flush_handlers
+## Unconditional, where a notified handler used to sit. Two things made that
+## handler unreliable, and they compound:
+##
+## 1. A handler fires only when its task reports a change. A run that added the
+##    repository and then failed before installing leaves every later run
+##    seeing 'ok', so the cache is never refreshed and 'docker-ce' stays
+##    unavailable until something else happens to refresh it.
+## 2. 'Install dependencies' above refreshes the cache *before* this repository
+##    exists. That resets the cache timestamp, so a 'cache_valid_time' on the
+##    install task below considers a cache that predates the repository recent
+##    enough to skip.
+##
+## Refreshing here, after the repository is configured and before anything is
+## installed from it, is the only ordering that holds on both a first run and a
+## re-run. 'changed_when: false' because a cache refresh is not a change to the
+## host, and reporting it as one makes every run look like it did work.
+- name: docker | Update apt cache for the Docker repository
+  ansible.builtin.apt:
+    update_cache: true
+  changed_when: false
   tags:
     - docker
 
+## No 'cache_valid_time': the task above has just refreshed the cache, so any
+## validity window here could only skip a refresh that is already known to be
+## needed.
 - name: docker | Install packages
   ansible.builtin.apt:
     state: "{{ docker_pkg_state }}"
-    cache_valid_time: 3600
     name:
       - docker-ce
       - docker-ce-cli
