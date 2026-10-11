@@ -8,7 +8,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install yamllint if needed
         shell: bash
@@ -32,7 +32,7 @@ jobs:
       matrix:
         scenario: [default]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: docker
 
